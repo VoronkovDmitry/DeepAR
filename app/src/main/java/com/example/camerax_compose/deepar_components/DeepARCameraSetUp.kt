@@ -13,6 +13,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.camerax_compose.list_mask
+import com.google.common.util.concurrent.ListenableFuture
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -21,6 +22,8 @@ class DeepARCameraSetUp(
     private val deepAR: DeepAR,
     private val surfaceProvider: DeepARSurfaceProvider?
     ) {
+
+    var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
 
     private var useExternalCameraTexture = true
 
@@ -33,11 +36,11 @@ class DeepARCameraSetUp(
     private var lensFacing = CameraSelector.LENS_FACING_FRONT
 
     fun setUpCamera(context: Context) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         val executor = ContextCompat.getMainExecutor(context)
-        cameraProviderFuture.addListener({
+        cameraProviderFuture?.addListener({
             try {
-                val cameraProvider = cameraProviderFuture.get()
+                val cameraProvider = cameraProviderFuture!!.get()
                 bindImageAnalysis(cameraProvider = cameraProvider,context)
             }catch (e:Exception){
                 Log.d("ADD_LISTENER_ERROR",e.toString())
@@ -96,6 +99,7 @@ class DeepARCameraSetUp(
             cameraProvider.bindToLifecycle(lifecycleOwner,cameraSelector,imageAnalysis)
         }
     }
+
     private val imageAnalyzer =
         ImageAnalysis.Analyzer { image ->
             val byteData: ByteArray

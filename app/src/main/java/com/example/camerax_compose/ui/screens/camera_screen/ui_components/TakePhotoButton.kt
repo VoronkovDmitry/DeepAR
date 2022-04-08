@@ -15,6 +15,8 @@ import androidx.lifecycle.ViewModel
 import com.example.camerax_compose.ui.screens.camera_screen.CameraViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.camerax_compose.ui.screens.MainNavGraphs
@@ -28,22 +30,36 @@ fun TakePhotoButton(
     modifier: Modifier,
     mainNav:NavController
 ) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val enabled by remember {
         vm.maskPanelVisible
     }
+    val configuration = LocalConfiguration.current
+    val width = configuration.screenWidthDp
+    val height = configuration.screenHeightDp
+
+    val pxWidth = with(LocalDensity.current){width.dp.toPx().toInt()} * 2 / 3
+    val pxHeight = with(LocalDensity.current){height.dp.toPx().toInt()} * 2 / 3
+    val isRecording by remember {
+        vm.isRecording
+    }
     Button(
         onClick = {
-            vm.takeScreenShot()
+            if (!isRecording)
+                vm.startVideo(pxWidth, pxHeight)
+            else {
+                vm.stopVideo()
+                mainNav.navigate(MainNavGraphs.VIDEO_SCREEN.name)
+            }
         },
         enabled = !enabled,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Red,
+            disabledBackgroundColor = Color.Red
+        ),
         modifier = modifier,
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.White
-        )
-        ) {}
+    ){}
+
 
 
 }

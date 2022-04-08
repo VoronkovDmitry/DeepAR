@@ -33,6 +33,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import com.example.camerax_compose.data.ParcelablePhoto
 import com.example.camerax_compose.deepAR_licence_key
 import com.example.camerax_compose.deepar_components.DeepARCameraSetUp
 import com.example.camerax_compose.deepar_components.DeepAREventListener
@@ -40,9 +41,11 @@ import com.example.camerax_compose.deepar_components.DeepARSurfaceProvider
 import com.example.camerax_compose.deepar_components.SurfaceHolderCallback
 import com.example.camerax_compose.domain.toBitmap
 import com.example.camerax_compose.list_mask
+import com.example.camerax_compose.ui.screens.MainNavGraphs
 import com.example.camerax_compose.ui.screens.camera_screen.CameraViewModel
 import com.example.camerax_compose.ui.screens.screenshot_screen.ScreenShotScreen
 import com.example.camerax_compose.ui.screens.splash_screen.SplashScreen
+import com.example.camerax_compose.ui.screens.video_screen.VideoScreen
 import com.example.camerax_compose.ui.theme.Teal200
 import kotlinx.coroutines.delay
 import java.lang.IllegalStateException
@@ -60,59 +63,15 @@ fun DeepARCamera(
 
     val surfaceView = SurfaceView(context)
 
-    var isPhoto by remember {
-        mutableStateOf(false)
-    }
     val photo by remember {
         vm.screenShot
     }
-    var screenShot:Bitmap? by remember {
-        mutableStateOf(null)
+
+    val isVideoVisible by remember {
+        vm.isVideoVisible
     }
 
 
-    val requestPermission = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = {
-            val result = vm.isPermissionsGranted()
-            if (result)
-                vm.setUpCamera(
-                    context = context,
-                    lifecycleOwner = lifecycleOwner
-                )
-        }
-    )
-
-    val deepARLifecycleObserver = LifecycleEventObserver{_,event->
-        when(event){
-            Lifecycle.Event.ON_START -> {
-                vm.checkPermission(
-                    requestPermission = requestPermission,
-                    lifecycleOwner = lifecycleOwner
-                )
-            }
-            Lifecycle.Event.ON_CREATE -> {}
-            Lifecycle.Event.ON_DESTROY -> {
-                vm.destroyDeepAR()
-            }
-            Lifecycle.Event.ON_PAUSE -> {}
-            Lifecycle.Event.ON_RESUME -> {}
-            Lifecycle.Event.ON_STOP -> {
-                vm.stopDeepAR()
-            }
-            else -> throw IllegalStateException()
-        }
-    }
-
-    DisposableEffect(key1 = lifecycleOwner, effect = {
-        vm.checkPermission(
-            requestPermission = requestPermission,
-            lifecycleOwner = lifecycleOwner
-        )
-        onDispose {
-            vm.stopDeepAR()
-        }
-    })
     Box(modifier = Modifier.fillMaxSize()){
         AndroidView(
             factory = {cxt ->
@@ -125,14 +84,17 @@ fun DeepARCamera(
                 .padding(15.dp)
                 .align(Alignment.TopStart)
         )
+
         TakePhotoButton(
             vm = vm,
             modifier = Modifier
                 .padding(70.dp)
                 .size(70.dp)
-                .align(Alignment.BottomCenter),
+                .align(Alignment.BottomCenter)
+            ,
             mainNav = mainNav
         )
+
         MaskPicker(
             vm = vm,
             modifier = Modifier
@@ -142,19 +104,17 @@ fun DeepARCamera(
                 )
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-
-
         )
+
+        if (photo.isNotEmpty())
+            ScreenShotScreen(screenShot = photo.toBitmap()) {
+                vm.clearScreenShot()
+            }
+
     }
 
-    LaunchedEffect(key1 = photo, block = {
-        if (photo.isNotEmpty()){
-            screenShot = photo.toBitmap()
-            isPhoto = true
-        }
-    })
-    if (isPhoto)
-        ScreenShotScreen(screenShot = screenShot!!, mainNav = mainNav){isPhoto = false}
+
+
 
 
 }

@@ -16,8 +16,7 @@ import com.example.camerax_compose.R
 @Composable
 fun BackButton(
     modifier: Modifier,
-    nav:NavController,
-    onClick:()->Unit
+    onClick:()->Unit,
 ) {
     IconButton(
         modifier = modifier,
@@ -31,7 +30,7 @@ fun BackButton(
         Icon(
             painter = painterResource(id = R.drawable.arrow_back),
             contentDescription = null,
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier.size(30.dp),
             tint = Color.White
         )
     }

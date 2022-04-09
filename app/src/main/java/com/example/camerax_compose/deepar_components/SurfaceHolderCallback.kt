@@ -5,11 +5,12 @@ import android.view.SurfaceHolder
 
 class SurfaceHolderCallback(val deepAR: DeepAR):SurfaceHolder.Callback {
 
-    override fun surfaceCreated(p0: SurfaceHolder) {
+    override fun surfaceCreated(holder: SurfaceHolder) {
 
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+
         deepAR.setRenderSurface(holder.surface,width, height)
     }
 

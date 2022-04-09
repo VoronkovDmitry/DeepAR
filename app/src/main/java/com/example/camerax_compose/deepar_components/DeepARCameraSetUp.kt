@@ -62,8 +62,9 @@ class DeepARCameraSetUp(
 
     private fun bindImageAnalysis(
         cameraProvider: ProcessCameraProvider,
-        context: Context) {
-        val cameraResolutionPreset = CameraResolutionPreset.P1920x1080
+        context: Context
+    ) {
+        val cameraResolutionPreset = CameraResolutionPreset.P1280x720
 
         val width = cameraResolutionPreset.height
         val height = cameraResolutionPreset.width

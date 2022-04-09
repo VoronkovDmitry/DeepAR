@@ -59,16 +59,11 @@ fun DeepARCamera(
     mainNav:NavController
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     val surfaceView = SurfaceView(context)
 
     val photo by remember {
         vm.screenShot
-    }
-
-    val isVideoVisible by remember {
-        vm.isVideoVisible
     }
 
 

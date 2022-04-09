@@ -48,7 +48,6 @@ class CameraViewModel @Inject constructor(
 
     private var currentCameraOrientation = CameraSelector.LENS_FACING_FRONT
 
-    var isVideoVisible = mutableStateOf(false)
 
     fun switchMaskPanelVisible(){
         maskPanelVisible.value = !maskPanelVisible.value
@@ -91,10 +90,6 @@ class CameraViewModel @Inject constructor(
 
     fun clearScreenShot(){
         screenShot.value = ""
-    }
-
-    fun clearVideo(){
-        isVideoVisible.value = false
     }
 
     fun destroyDeepAR(){
@@ -186,14 +181,12 @@ class CameraViewModel @Inject constructor(
     fun stopVideo(){
         if (isRecording.value){
             deepAR.stopVideoRecording()
-            stopDeepAR()
             Toast.makeText(
                 context,
                 "Recording " + file?.name + " saved.",
                 Toast.LENGTH_LONG
             ).show()
             isRecording.value = false
-            isVideoVisible.value = true
         }
     }
 
